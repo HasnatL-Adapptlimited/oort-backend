@@ -23,11 +23,14 @@ export default {
         );
       }
 
+      const startTime = performance.now();
       // get data and permissions
       const form = await Form.findById(args.id).populate({
         path: 'resource',
         model: 'Resource',
       });
+      const endTime = performance.now();
+      console.log(`Form found in: ${endTime - startTime} milliseconds`);
       if (!form) {
         throw new GraphQLError(context.i18next.t('common.errors.dataNotFound'));
       }
@@ -38,7 +41,8 @@ export default {
           context.i18next.t('common.errors.permissionNotGranted')
         );
       }
-
+      const endTime2 = performance.now();
+      console.log(`Form returned in: ${endTime2 - startTime} milliseconds`);
       return form;
     } catch (err) {
       logger.error(err.message, { stack: err.stack });

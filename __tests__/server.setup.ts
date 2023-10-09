@@ -16,6 +16,7 @@ import EventEmitter from 'events';
 import dataSources from '@server/apollo/dataSources';
 import defineUserAbility from '@security/defineUserAbility';
 import i18nextMiddleware from 'i18next-http-middleware';
+import * as Sentry from '@sentry/node';
 
 /**
  * Definition of test server.
@@ -35,6 +36,11 @@ class SafeTestServer {
    * @param schema GraphQL schema.
    */
   public async start(schema: GraphQLSchema): Promise<void> {
+    // === Sentry ===
+    Sentry.init({
+      dsn: 'https://37ca208310369a4cee685fd50e1105ad@o4504696331632640.ingest.sentry.io/4505997745782784',
+    });
+
     // === EXPRESS ===
     this.app = express();
 
@@ -54,6 +60,7 @@ class SafeTestServer {
       });
 
     // === MIDDLEWARES ===
+    this.app.use(Sentry.Handlers.requestHandler());
     this.app.use(rateLimitMiddleware);
     this.app.use(corsMiddleware);
     // this.app.use(authMiddleware);
@@ -77,6 +84,8 @@ class SafeTestServer {
     this.app.use(router);
 
     this.status.emit('ready');
+
+    this.app.use(Sentry.Handlers.errorHandler());
   }
 
   /**

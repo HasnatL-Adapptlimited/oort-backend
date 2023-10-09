@@ -66,6 +66,7 @@ async function insertRecords(
   //     }
   // }
   if (canCreate) {
+    const startTime = performance.now();
     const records: Record[] = [];
     const dataSets: { data: any; positionAttributes: PositionAttribute[] }[] =
       [];
@@ -78,7 +79,17 @@ async function insertRecords(
       if (rowNumber === 1) {
         columns = getUploadColumns(fields, values);
       } else {
-        dataSets.push(loadRow(columns, values));
+        for (let i = 0; i < 1; i++) {
+          const row1 = loadRow(columns, values);
+          row1.data.question1 = `${row1.data.question1} ${i}`;
+
+          row1.data.question2 = `${row1.data.question2} Test ${i}`;
+          dataSets.push(row1);
+        }
+        const endTime = performance.now();
+        console.log(
+          `Workbook Records Loaded in: ${endTime - startTime} milliseconds`
+        );
       }
     });
 
@@ -117,6 +128,8 @@ async function insertRecords(
         })
       );
     }
+    const endTime2 = performance.now();
+    console.log(`Records Created in: ${endTime2 - startTime} milliseconds`);
     if (records.length > 0) {
       try {
         Record.insertMany(records);
@@ -140,6 +153,7 @@ async function insertRecords(
  */
 router.post('/form/records/:id', async (req: any, res) => {
   try {
+    const startTime = performance.now();
     // Check file
     if (!req.files || Object.keys(req.files).length === 0)
       return res
@@ -165,6 +179,8 @@ router.post('/form/records/:id', async (req: any, res) => {
       return res.status(404).send(i18next.t('common.errors.dataNotFound'));
 
     // Insert records if authorized
+    const endTime = performance.now();
+    console.log(`Records Inserted in: ${endTime - startTime} milliseconds`);
     return await insertRecords(res, file, form, form.fields, req.context);
   } catch (err) {
     logger.error(err.message, { stack: err.stack });
@@ -178,6 +194,7 @@ router.post('/form/records/:id', async (req: any, res) => {
 router.post('/resource/records/:id', async (req: any, res) => {
   try {
     // Check file
+    const startTime = performance.now();
     if (!req.files || Object.keys(req.files).length === 0)
       return res
         .status(400)
@@ -202,6 +219,8 @@ router.post('/resource/records/:id', async (req: any, res) => {
       return res.status(404).send(i18next.t('common.errors.dataNotFound'));
 
     // Insert records if authorized
+    const endTime = performance.now();
+    console.log(`Records uploaded in in: ${endTime - startTime} milliseconds`);
     return await insertRecords(res, file, form, resource.fields, req.context);
   } catch (err) {
     logger.error(err.message, { stack: err.stack });
