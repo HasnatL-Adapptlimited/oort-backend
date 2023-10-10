@@ -3,6 +3,7 @@ import { FormType } from '../types';
 import { Form } from '@models';
 import extendAbilityForRecords from '@security/extendAbilityForRecords';
 import { logger } from '@services/logger.service';
+import * as Sentry from '@sentry/node';
 
 /**
  * Return form from id if available for the logged user.
@@ -31,6 +32,7 @@ export default {
       });
       const endTime = performance.now();
       console.log(`Form found in: ${endTime - startTime} milliseconds`);
+      Sentry.captureException(new Error('This is a test error!'));
       if (!form) {
         throw new GraphQLError(context.i18next.t('common.errors.dataNotFound'));
       }
