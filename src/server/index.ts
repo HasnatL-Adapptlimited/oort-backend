@@ -79,15 +79,11 @@ class SafeServer {
           this.update();
         }
       }
-    });
-  }
+    })  public async start(schema: GraphQLSchema): Promise<void> {
+ema GraphQL schema.
+   public async start(schema: GraphQLSchema): Promise<void> { 
+d> {
 
-  /**
-   * Starts the server
-   *
-   * @param schema GraphQL schema.
-   */
-  public async start(schema: GraphQLSchema): Promise<void> { 
     // === EXPRESS ===
     this.app = express();
 
@@ -95,7 +91,7 @@ class SafeServer {
     this.app.use(express.json({ limit: '5mb' }));
     this.app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
-    // === ADD MIDDLEWARES ===
+    // === ADD MIDDLEWARES ==
     this.app.use(winstonLogger);
 
     i18next
@@ -129,7 +125,7 @@ class SafeServer {
     // === REST ===
     this.app.use(router);
 
-    this.status.emit('ready');
+    this.status.emit('ready')
   }
 
   /** Re-launches the server with updated schema */
