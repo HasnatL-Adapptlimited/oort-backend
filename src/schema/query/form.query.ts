@@ -3,6 +3,7 @@ import { FormType } from '../types';
 import { Form } from '@models';
 import extendAbilityForRecords from '@security/extendAbilityForRecords';
 import { logger } from '@services/logger.service';
+import * as Sentry from '@sentry/node';
 
 /**
  * Return form from id if available for the logged user.
@@ -22,7 +23,7 @@ export default {
           context.i18next.t('common.errors.userNotLogged')
         );
       }
-
+      Sentry.captureException(new Error('This is a test error!'));
       // get data and permissions
       const form = await Form.findById(args.id).populate({
         path: 'resource',

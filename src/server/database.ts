@@ -61,7 +61,7 @@ const mongoDBUrl = (): string => {
  * @param options mongo connect options
  */
 export const startDatabase = async (options?: any) => {
-  await mongoose.connect(mongoDBUrl(), {
+  await mongoose.connect('mongodb://127.0.0.1:27017/databaseone', {
     autoIndex: true,
     ...options,
     ...(config.get('database.sslCA') && {
