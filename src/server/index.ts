@@ -87,7 +87,7 @@ class SafeServer {
    *
    * @param schema GraphQL schema.
    */
-  public async start(schema: GraphQLSchema): Promise<void> {
+  public async start(schema: GraphQLSchema): Promise<void> { 
     // === EXPRESS ===
     this.app = express();
 
