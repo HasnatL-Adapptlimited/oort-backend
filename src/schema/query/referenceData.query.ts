@@ -21,6 +21,7 @@ export default {
           context.i18next.t('common.errors.userNotLogged')
         );
       }
+      console.log("I'm in Reference Data Query Class!");
       return await ReferenceData.findById(args.id);
     } catch (err) {
       logger.error(err.message, { stack: err.stack });

@@ -22,7 +22,7 @@ export default {
           context.i18next.t('common.errors.userNotLogged')
         );
       }
-
+      const startTime = performance.now();
       const ability: AppAbility = user.ability;
       const resource = await Resource.findOne({ _id: args.id });
 
@@ -31,6 +31,8 @@ export default {
           context.i18next.t('common.errors.permissionNotGranted')
         );
       }
+      const endTime = performance.now();
+      console.log(`Resource Fetch Took: ${endTime - startTime} milliseconds`);
       return resource;
     } catch (err) {
       logger.error(err.message, { stack: err.stack });

@@ -81,7 +81,12 @@ export default {
   async resolve(parent, args, context) {
     // Make sure that the page size is not too important
     const first = args.first || DEFAULT_FIRST;
+    const startTime = performance.now();
     checkPageSize(first);
+    const endTime = performance.now();
+    console.log(
+      `Reference Data Page size check took: ${endTime - startTime} milliseconds`
+    );
     try {
       // Authentication check
       const user = context.user;

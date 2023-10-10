@@ -23,7 +23,7 @@ export default {
           context.i18next.t('common.errors.userNotLogged')
         );
       }
-
+      const startTime = performance.now();
       // Get the form and the record
       const record = await Record.findById(args.id);
       const form = await Form.findById(record.form);
@@ -35,7 +35,8 @@ export default {
           context.i18next.t('common.errors.permissionNotGranted')
         );
       }
-
+      const endTime = performance.now();
+      console.log(`Record Fetch took: ${endTime - startTime} milliseconds`);
       // Return the record
       return getAccessibleFields(record, ability);
     } catch (err) {

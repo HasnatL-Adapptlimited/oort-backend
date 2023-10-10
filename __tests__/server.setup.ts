@@ -16,6 +16,7 @@ import EventEmitter from 'events';
 import dataSources from '@server/apollo/dataSources';
 import defineUserAbility from '@security/defineUserAbility';
 import i18nextMiddleware from 'i18next-http-middleware';
+import * as Sentry from '@sentry/node';
 
 /**
  * Definition of test server.
@@ -35,8 +36,30 @@ class SafeTestServer {
    * @param schema GraphQL schema.
    */
   public async start(schema: GraphQLSchema): Promise<void> {
+    // === Sentry ===
+    Sentry.init({
+      dsn: 'https://37ca208310369a4cee685fd50e1105ad@o4504696331632640.ingest.sentry.io/4505997745782784',
+      integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+        // enable Express.js middleware tracing
+        new Sentry.Integrations.Express({
+          // to trace all requests to the default router
+          app: this.app,
+          // alternatively, you can specify the routes you want to trace:
+          // router: someRouter,
+        }),
+      ],
+
+      // We recommend adjusting this value in production, or using tracesSampler
+      // for finer control
+      // tracesSampleRate: 1.0,
+    });
+
     // === EXPRESS ===
     this.app = express();
+
+    console.log("I've been hit");
 
     // === REQUEST SIZE ===
     this.app.use(express.json({ limit: '5mb' }));
@@ -54,6 +77,8 @@ class SafeTestServer {
       });
 
     // === MIDDLEWARES ===
+    this.app.use(Sentry.Handlers.requestHandler() as express.RequestHandler);
+    this.app.use(Sentry.Handlers.tracingHandler());
     this.app.use(rateLimitMiddleware);
     this.app.use(corsMiddleware);
     // this.app.use(authMiddleware);
@@ -77,6 +102,21 @@ class SafeTestServer {
     this.app.use(router);
 
     this.status.emit('ready');
+
+    this.app.get('/', function rootHandler(req, res) {
+      res.end('Hello world!');
+    });
+
+    this.app.use(Sentry.Handlers.errorHandler() as express.ErrorRequestHandler);
+
+    // this.app.use(function onError(err, req, res, _next) {
+    //   // The error id is attached to `res.sentry` to be returned
+    //   // and optionally displayed to the user for support.
+    //   res.statusCode = 500;
+    //   res.end(res.sentry + '\n');
+    // });
+
+    this.app.listen(4200);
   }
 
   /**
